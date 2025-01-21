@@ -1,0 +1,12 @@
+title	1
+gushi	1
+shijiu	1
+shou	1
+古詩十九首	1
+nineteen	1
+ancient	1
+poems	1
+author	1
+蕭統	1
+tong	1
+xiao	1

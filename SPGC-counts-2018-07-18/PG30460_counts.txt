@@ -1,0 +1,12 @@
+title	1
+chu	1
+shi	1
+biao	1
+author	1
+liang	1
+zhu	1
+ge	1
+出師表	1
+諸葛亮	1
+前出師表	1
+後出師表	1
