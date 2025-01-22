@@ -1,4 +1,6 @@
 import os
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 
 print ("Please write the ID (e.g., 10 or 14). Please choose a number that is availavle in the folder of Counts.")
 id = input (). strip ()
@@ -36,4 +38,54 @@ def analysis(full_path):
 
         
 text_result = analysis (full_path)
-print (text_result)
+# print (text_result)
+
+output_file = f"emotion_analysis_{id}.tsv"
+output_dir = r"results"
+output_path = os.path.join(output_dir, output_file)
+
+with open(output_path, 'w', newline='', encoding='utf-8') as tsv_file:
+    writer = csv.writer(tsv_file, delimiter='\t')
+    # Write header
+    writer.writerow(['Word', 'Count', 'Emotions'])
+    # Write data
+    for word, (count, emotions) in text_result.items():
+        writer.writerow([word, count, ', '.join(emotions)])
+
+print(f"Emotion analysis saved to {output_path}")
+
+
+def words_info (file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        x = 0
+        Words_dict = {}
+        for line in file:
+            if x < 20: 
+                word, number = line. strip ().split ('\t')
+                if word not in Words_dict:
+                    Words_dict[word] = []
+                Words_dict [word].append (number)
+                x += 1
+            else:
+              break
+    return Words_dict
+
+Most_frequent_words = words_info (full_path)
+print (Most_frequent_words)
+
+cleaned_data = {word: int(numbers[0]) for word, numbers in Most_frequent_words.items()}
+wordcloud = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(cleaned_data)
+
+# Display the word cloud using matplotlib
+plt.figure(figsize=(10, 5))
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis('off')  # Turn off the axis
+plt.show()
+
+# Save the word cloud as a PNG file
+output_wordcloud_file = f"wordcloud_{id}.png"
+output_wordcloud_path = os.path.join(output_dir, output_wordcloud_file)
+wordcloud.to_file(output_wordcloud_path)
+
+print(f"Word cloud saved to {output_wordcloud_path}")
+
