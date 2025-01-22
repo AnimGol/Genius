@@ -2,7 +2,7 @@ import os
 
 print ("Please write the ID (e.g., 10 or 14). Please choose a number that is availavle in the folder of Counts.")
 id = input (). strip ()
-text_folder_path = r"C:\Users\minag\OneDrive\Desktop\metadata_project\SPGC-counts-2018-07-18"
+text_folder_path = r"SPGC-counts-2018-07-18"
 file_name = f"PG{id}_counts.txt"
 full_path = os.path.join(text_folder_path, file_name)  # Combine folder and file name
 
@@ -22,7 +22,7 @@ def emotion_dictionary (file_path):
                     emotion_lexicon[word] = []
                 emotion_lexicon[word].append(emotion)
     return emotion_lexicon
-result = emotion_dictionary(r'C:\Users\minag\OneDrive\Desktop\metadata_project\NRC-Emotion_Lexicon\NRC-Emotion-Lexicon\NRC-Emotion-Lexicon-Wordlevel-v0.92.txt')
+result = emotion_dictionary(r'NRC-Emotion-Lexicon-Wordlevel-v0.92.txt')
 # print (result)
 
 def analysis(full_path):
