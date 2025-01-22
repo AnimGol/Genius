@@ -1,4 +1,5 @@
 import os
+import csv
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
@@ -33,7 +34,7 @@ def analysis(full_path):
         for line in file:
             word, count = line.strip().split('\t')
             emotions = result.get(word, [])  # Get emotions if the word exists in the emotion lexicon
-            second_lexicon[word] = f"{count}, {emotions}"  # Store count and emotions as a string
+            second_lexicon[word] = (int(count), emotions) 
     return second_lexicon
 
         
