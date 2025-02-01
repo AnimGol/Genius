@@ -1,6 +1,11 @@
 import os
 import csv
-from wordcloud import WordCloud
+try: 
+    from wordcloud import WordCloud
+except ImportError:
+    import subprocess
+    subprocess.check_call(["pip", "install", "wordcloud"])
+    from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
 print ("Please write the ID (e.g., 10 or 14). Please choose a number that is availavle in the folder of Counts.")
