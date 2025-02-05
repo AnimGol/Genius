@@ -8,6 +8,9 @@ except ImportError:
     from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import seaborn as sns
+import nltk
+nltk.download('stopwords')
+from nltk corpus import stopwords
 
 print ("Please write the ID (e.g., 10 or 14). Please choose a number that is availavle in the folder of Counts.")
 id = input (). strip ()
@@ -121,7 +124,7 @@ def words_info (file_path):
         x = 0
         Words_dict = {}
         for line in file:
-            if x < 20: 
+            if x < 40: 
                 word, number = line. strip ().split ('\t')
                 if word not in Words_dict:
                     Words_dict[word] = []
@@ -132,7 +135,7 @@ def words_info (file_path):
     return Words_dict
 
 Most_frequent_words = words_info (full_path)
-print (Most_frequent_words)
+# print (Most_frequent_words)
 
 cleaned_data = {word: int(numbers[0]) for word, numbers in Most_frequent_words.items()}
 wordcloud = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(cleaned_data)
@@ -149,4 +152,26 @@ output_wordcloud_path = os.path.join(output_dir, output_wordcloud_file)
 wordcloud.to_file(output_wordcloud_path)
 
 print(f"Word cloud saved to {output_wordcloud_path}")
+
+# Here we have a set or collection of stopwords in English:
+stop_words = set(stopwords.words('english'))  
+cleaned_nonstop_data = {word: count for word, count in cleaned_data.items() if word.lower() not in stop_words}
+top_10_nonstop_words = dict(sorted(cleaned_nonstop_data.items(), key=lambda item: item[1], reverse=True)[:10])
+
+wordcloud_nonstop = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(top_10_nonstop_words)
+
+plt.figure(figsize=(10, 5))
+plt.imshow(wordcloud_nonstop, interpolation='bilinear')
+plt.axis('off')
+plt.show()
+
+# Save the non-stop word cloud
+output_wordcloud_nonstop_file = f"wordcloud_nonstop_{id}.png"
+output_wordcloud_nonstop_path = os.path.join(output_dir, output_wordcloud_nonstop_file)
+wordcloud_nonstop.to_file(output_wordcloud_nonstop_path)
+
+print(f"Non-stop word cloud saved to {output_wordcloud_nonstop_path}")
+
+
+
 
