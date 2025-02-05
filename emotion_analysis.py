@@ -48,6 +48,10 @@ text_result = analysis (full_path)
 
 output_file = f"emotion_analysis_{id}.tsv"
 output_dir = r"results"
+
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+    
 output_path = os.path.join(output_dir, output_file)
 
 with open(output_path, 'w', newline='', encoding='utf-8') as tsv_file:
