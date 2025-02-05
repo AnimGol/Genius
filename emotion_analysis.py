@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import nltk
 nltk.download('stopwords')
-from nltk corpus import stopwords
+from nltk.corpus import stopwords
 
 print ("Please write the ID (e.g., 10 or 14). Please choose a number that is availavle in the folder of Counts.")
 id = input (). strip ()
