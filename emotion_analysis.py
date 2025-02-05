@@ -1,12 +1,19 @@
 import os
 import csv
-import spacy
+
 try: 
     from wordcloud import WordCloud
 except ImportError:
     import subprocess
     subprocess.check_call(["pip", "install", "wordcloud"])
     from wordcloud import WordCloud
+
+try:
+    import spacy
+except ImportError:
+    subprocess.check_call (["pip", "install", "spacy"])
+    import spacy    
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 
