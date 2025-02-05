@@ -124,7 +124,7 @@ def words_info (file_path):
         x = 0
         Words_dict = {}
         for line in file:
-            if x < 40: 
+            if x < 50: 
                 word, number = line. strip ().split ('\t')
                 if word not in Words_dict:
                     Words_dict[word] = []
