@@ -159,3 +159,27 @@ output_wordcloud_path = os.path.join(output_dir, output_wordcloud_file)
 wordcloud.to_file(output_wordcloud_path)
 
 print(f"Word cloud saved to {output_wordcloud_path}")
+
+# Here we have a set or collection of stopwords in English:
+stop_words = set(stopwords.words('english'))  
+cleaned_nonstop_data = {word: count for word, count in cleaned_data.items() if word.lower() not in stop_words}
+top_10_nonstop_words = dict(sorted(cleaned_nonstop_data.items(), key=lambda item: item[1], reverse=True)[:10])
+
+wordcloud_nonstop = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(top_10_nonstop_words)
+
+plt.figure(figsize=(10, 5))
+plt.imshow(wordcloud_nonstop, interpolation='bilinear')
+plt.axis('off')
+plt.show()
+
+# Save the non-stop word cloud
+output_wordcloud_nonstop_file = f"wordcloud_nonstop_{id}.png"
+output_wordcloud_nonstop_path = os.path.join(output_dir, output_wordcloud_nonstop_file)
+wordcloud_nonstop.to_file(output_wordcloud_nonstop_path)
+
+print(f"Non-stop word cloud saved to {output_wordcloud_nonstop_path}")
+
+
+
+
+
