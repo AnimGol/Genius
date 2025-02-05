@@ -12,7 +12,7 @@ try:
     import spacy
     from spacy.cli import download
 except ImportError:
-    subprocess.check_call (["pip", "install", "spacy"])
+    subprocess.check_call(["pip", "install", "spacy"])
     import spacy
     from spacy.cli import download
 
@@ -44,9 +44,11 @@ def emotion_dictionary(file_path):
                 if word_lemma not in emotion_lexicon:
                     emotion_lexicon[word_lemma] = []
                 emotion_lexicon[word_lemma].append(emotion)
+    print(f"Emotion lexicon built with {len(emotion_lexicon)} unique words.")
     return emotion_lexicon
 
 result = emotion_dictionary(r'NRC-Emotion-Lexicon-Wordlevel-v0.92.txt')
+# Uncomment this to inspect the result:
 # print(result)
 
 def analysis(full_path):
@@ -56,10 +58,13 @@ def analysis(full_path):
             word, count = line.strip().split('\t')
             word_lemma = nlp(word)[0].lemma_  # Lemmatize the word
             emotions = result.get(word_lemma, [])  # Get emotions based on the lemma
-            second_lexicon[word_lemma] = (int(count), emotions)
+            if emotions:  # Only add words with associated emotions
+                second_lexicon[word_lemma] = (int(count), emotions)
+    print(f"Text analysis found {len(second_lexicon)} words with associated emotions.")
     return second_lexicon
 
 text_result = analysis(full_path)
+# Uncomment this to inspect the analysis result:
 # print(text_result)
 
 output_file = f"emotion_analysis_{id}.tsv"
@@ -95,40 +100,49 @@ def emotion_frequency(output_path):
                         emotions_in_text[emotion] += int(number)
                     else:
                         emotions_in_text[emotion] = int(number)
+    print(f"Emotion frequencies calculated: {emotions_in_text}")
     return emotions_in_text
 
 emotion_frequency = emotion_frequency(output_path)
-print(emotion_frequency)
+
+# Debug output for emotion frequencies
+if emotion_frequency:
+    print(f"Emotion frequencies: {emotion_frequency}")
+else:
+    print("No emotions found in the analysis.")
 
 # Create a bar chart
-emotions = list(emotion_frequency.keys())
-values = list(emotion_frequency.values())
-import seaborn as sns
-import matplotlib.pyplot as plt
-sns.set(style="whitegrid")
-plt.figure(figsize=(10, 6))  # Set the figure size
-bars = plt.bar(emotions, values, color=sns.color_palette("Blues", n_colors=len(emotions)))
+if emotion_frequency:  # Only proceed with visualization if there are emotions to plot
+    emotions = list(emotion_frequency.keys())
+    values = list(emotion_frequency.values())
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    sns.set(style="whitegrid")
+    plt.figure(figsize=(10, 6))  # Set the figure size
+    bars = plt.bar(emotions, values, color=sns.color_palette("Blues", n_colors=len(emotions)))
 
-# Adding titles and labels
-plt.title('Emotion Frequency Distribution', fontsize=18, weight='bold', family='serif')
-plt.xlabel('Emotions', fontsize=12, weight='bold', family='serif')
-plt.ylabel('Frequency', fontsize=12, weight='bold', family='serif')
+    # Adding titles and labels
+    plt.title('Emotion Frequency Distribution', fontsize=18, weight='bold', family='serif')
+    plt.xlabel('Emotions', fontsize=12, weight='bold', family='serif')
+    plt.ylabel('Frequency', fontsize=12, weight='bold', family='serif')
 
-# Rotate the x-axis labels for better visibility
-plt.xticks(rotation=45, fontsize=12)
+    # Rotate the x-axis labels for better visibility
+    plt.xticks(rotation=45, fontsize=12)
 
-# Adding grid lines to make the chart more readable
-plt.grid(axis='y', linestyle='--', alpha=0.7) 
+    # Adding grid lines to make the chart more readable
+    plt.grid(axis='y', linestyle='--', alpha=0.7) 
 
-for bar in bars:
-    yval = bar.get_height()
-    plt.text(bar.get_x() + bar.get_width()/2, yval + 100, round(yval, 0), ha='center', va='bottom', fontsize=10)
+    for bar in bars:
+        yval = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2, yval + 100, round(yval, 0), ha='center', va='bottom', fontsize=10)
 
-# Display the chart
-plt.tight_layout()
-# plt.show()        
-plt.savefig(f"barchart{id}.png")  
-print('The barchart is saved.')
+    # Display the chart
+    plt.tight_layout()
+    # plt.show()        
+    plt.savefig(f"barchart{id}.png")  
+    print('The barchart is saved.')
+else:
+    print("No emotions to display in the bar chart.")
 
 def words_info(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -147,7 +161,7 @@ def words_info(file_path):
     return Words_dict
 
 Most_frequent_words = words_info(full_path)
-print(Most_frequent_words)
+print(f"Most frequent words: {Most_frequent_words}")
 
 cleaned_data = {nlp(word)[0].lemma_: int(numbers[0]) for word, numbers in Most_frequent_words.items()}
 wordcloud = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(cleaned_data)
