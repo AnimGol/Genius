@@ -7,6 +7,7 @@ except ImportError:
     subprocess.check_call(["pip", "install", "wordcloud"])
     from wordcloud import WordCloud
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 print ("Please write the ID (e.g., 10 or 14). Please choose a number that is availavle in the folder of Counts.")
 id = input (). strip ()
@@ -63,6 +64,56 @@ with open(output_path, 'w', newline='', encoding='utf-8') as tsv_file:
         writer.writerow([word, count, ', '.join(emotions)])
 
 print(f"Emotion analysis saved to {output_path}")
+
+
+def emotion_frequency (output_path):
+            emotions_in_text = {}
+            with open (output_path) as tsv_file:
+                reader = csv.reader (tsv_file, delimiter='\t')
+                next (reader)   # Skip the header row
+                for row in reader:
+                    word, number, emotions = row
+                    separated_emotions= emotions.strip().split(',')
+                    for emotion in separated_emotions:
+                        if emotion in ['anticipation', 'joy', 'positive', 'surprise', 'trust', 'anger', 'negative', 'disgust', 'fear', 'sadness']:
+                          # Increment the count for the emotion
+                            if emotion in emotions_in_text:
+                                   emotions_in_text[emotion] += int(number)
+                            else:
+                                   emotions_in_text[emotion] = int(number)
+            return emotions_in_text
+        
+emotion_frequency =  emotion_frequency (output_path) 
+print (emotion_frequency)
+
+
+emotions = list(emotion_frequency.keys())
+values = list(emotion_frequency.values())
+sns.set(style="whitegrid")
+# Create a bar chart
+plt.figure(figsize=(10, 6))  # Set the figure size
+bars = plt.bar(emotions, values, color=sns.color_palette("Blues", n_colors=len(emotions)))
+
+        # Adding titles and labels
+plt.title('Emotion Frequency Distribution', fontsize=18, weight='bold', family='serif')
+plt.xlabel('Emotions', fontsize=12, weight='bold', family='serif')
+plt.ylabel('Frequency', fontsize=12, weight='bold', family='serif')
+
+        # Rotate the x-axis labels for better visibility
+plt.xticks(rotation=45, fontsize=12)
+
+        # Adding grid lines to make the chart more readable
+plt.grid(axis='y', linestyle='--', alpha=0.7) 
+
+for bar in bars:
+  yval = bar.get_height()
+  plt.text(bar.get_x() + bar.get_width()/2, yval + 100, round(yval, 0), ha='center', va='bottom', fontsize=10)
+
+# Display the chart
+plt.tight_layout()
+# plt.show()        
+plt.savefig(f"barchart{id}.png")  
+print ('The barchart is saved.')
 
 
 def words_info (file_path):
