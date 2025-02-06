@@ -67,7 +67,7 @@ text_result = analysis (full_path)
 # print (text_result)
 
 output_file = f"emotion_analysis_{id}.tsv"
-output_dir = r"results"
+output_dir = r"SPGC-counts-2018-07-18"
 
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
@@ -131,7 +131,7 @@ for bar in bars:
 # Display the chart
 plt.tight_layout()
 # plt.show()        
-plt.savefig(f"barchart{id}.png")  
+plt.savefig(os.path.join(output_dir, f"barchart{id}.png"))
 print ('The barchart is saved.')
 
 
@@ -165,7 +165,7 @@ plt.show()
 # Save the word cloud as a PNG file
 output_wordcloud_file = f"wordcloud_{id}.png"
 output_wordcloud_path = os.path.join(output_dir, output_wordcloud_file)
-wordcloud.to_file(output_wordcloud_path)
+wordcloud.to_file(os.path.join(output_dir, f"wordcloud_{id}.png"))
 
 print(f"Word cloud saved to {output_wordcloud_path}")
 
@@ -184,7 +184,7 @@ plt.show()
 # Save the non-stop word cloud
 output_wordcloud_nonstop_file = f"wordcloud_nonstop_{id}.png"
 output_wordcloud_nonstop_path = os.path.join(output_dir, output_wordcloud_nonstop_file)
-wordcloud_nonstop.to_file(output_wordcloud_nonstop_path)
+wordcloud_nonstop.to_file(os.path.join(output_dir, f"wordcloud_nonstop_{id}.png"))
 
 print(f"Non-stop word cloud saved to {output_wordcloud_nonstop_path}")
 
@@ -203,4 +203,13 @@ def sum_counts (full_path ):
 
 x = sum_counts (full_path)
 print ('Word count in this text is ', x)
+
+
+
+
+
+# Now trying to save the results and then adding the links to our db:
+genius1_link = os.path.join(output_dir, f"wordcloud_{id}.png")
+genius2_link = os.path.join(output_dir, f"wordcloud_nonstop_{id}.png")
+genius3_link = os.path.join(output_dir, f"barchart{id}.png")
 
