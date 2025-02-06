@@ -1,5 +1,7 @@
 import os
 import csv
+import subprocess
+
 try: 
     from wordcloud import WordCloud
 except ImportError:
