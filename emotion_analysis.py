@@ -67,12 +67,12 @@ text_result = analysis (full_path)
 # print (text_result)
 
 output_file = f"emotion_analysis_{id}.tsv"
-output_dir = r"SPGC-counts-2018-07-18"
+output_dir = r"results"
 
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
     
-output_path = os.path.join(output_dir, output_file)
+output_path = os.path.join(r"results", output_file)
 
 with open(output_path, 'w', newline='', encoding='utf-8') as tsv_file:
     writer = csv.writer(tsv_file, delimiter='\t')
