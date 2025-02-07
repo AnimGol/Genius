@@ -4,9 +4,9 @@ import sqlite3
 conn = sqlite3.connect("Genius.db") 
 cursor = conn.cursor()
 
-# cursor.execute('''ALTER TABLE "Works Collection" ADD COLUMN "wordcloud for Most Frequent Words" TEXT''')
-# cursor.execute('''ALTER TABLE "Works Collection" ADD COLUMN "wordcloud for nonstop words" TEXT''')
-# cursor.execute('''ALTER TABLE "Works Collection" ADD COLUMN "Barchart for emotion analysis" TEXT''')
+cursor.execute('''ALTER TABLE "Works Collection" ADD COLUMN "wordcloud for Most Frequent Words" TEXT''')
+cursor.execute('''ALTER TABLE "Works Collection" ADD COLUMN "wordcloud for nonstop words" TEXT''')
+cursor.execute('''ALTER TABLE "Works Collection" ADD COLUMN "Barchart for emotion analysis" TEXT''')
 
 
 # Check if the table exists
