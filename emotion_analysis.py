@@ -105,6 +105,36 @@ def emotion_frequency (output_path):
 emotion_frequency =  emotion_frequency (output_path) 
 print (emotion_frequency)
 
+def total_emotion_count (emotion_frequency):
+    total = sum (emotion_frequency.values())
+    return total
+
+def add_percentage_to_emotions(emotion_frequency):
+    total_count = total_emotion_count(emotion_frequency)
+    emotion_percentage = {}
+    for emotion, count in emotion_frequency.items():
+        percentage = (count / total_count) * 100  
+        emotion_percentage[emotion] = percentage
+    return emotion_percentage
+
+percentages = add_percentage_to_emotions (emotion_frequency)
+
+
+def save_emotion_results (emotion_frequency, percentages, outputfile):
+    with open(outputfile, mode='w', newline='') as file:
+        writer = csv.writer(file, delimiter='\t')
+        writer.writerow(['Emotion', 'Count', 'Percentage'])  # Write header
+        for emotion in emotion_frequency:
+            count = emotion_frequency[emotion]  # Get the count for the emotion
+            percentage = percentages.get(emotion, 0)  # Get the percentage for the emotion
+            writer.writerow([emotion, count, round(percentage, 2)])  # Write the count and percentage
+
+
+
+save_emotions_percentage = f"emotion_percentage_{id}.tsv"
+y = os.path.join(r"results", save_emotions_percentage)
+save = save_emotion_results (emotion_frequency, percentages, y)
+print(f"emotion percentage saved to {y}")
 
 emotions = list(emotion_frequency.keys())
 values = list(emotion_frequency.values())
@@ -212,3 +242,7 @@ print ('Word count in this text is ', x)
 genius1_link = os.path.join(output_dir, f"wordcloud_{id}.png")
 genius2_link = os.path.join(output_dir, f"wordcloud_nonstop_{id}.png")
 genius3_link = os.path.join(output_dir, f"barchart{id}.png")
+
+# working on interactive features
+emotion = input("Enter the emotion you want to search for (e.g., joy, sadness): ").strip()
+percentage = float(input("Enter the percentage you're looking for (e.g., 50): ").strip())
