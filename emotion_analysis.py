@@ -1,6 +1,7 @@
 import os
 import csv
 import subprocess
+import pandas as pd
 
 try: 
     from wordcloud import WordCloud
