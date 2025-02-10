@@ -250,3 +250,7 @@ genius3_link = os.path.join(output_dir, f"barchart{id}.png")
 # working on interactive features
 emotion = input("Enter the emotion you want to search for (e.g., joy, sadness): ").strip()
 percentage = float(input("Enter the percentage you're looking for (e.g., 50): ").strip())
+
+result_path = r"results"
+# file_name = f"PG{id}_counts.txt"
+# full_path = os.path.join(text_folder_path, file_name) 
