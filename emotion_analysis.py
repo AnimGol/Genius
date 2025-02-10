@@ -248,9 +248,32 @@ genius2_link = os.path.join(output_dir, f"wordcloud_nonstop_{id}.png")
 genius3_link = os.path.join(output_dir, f"barchart{id}.png")
 
 # working on interactive features
-emotion = input("Enter the emotion you want to search for (e.g., joy, sadness): ").strip().lower()
-percentage = float(input("Enter the percentage you're looking for (e.g., 50): ").strip())
+search_emotion = input("Enter the emotion you want to search for (e.g., joy, sadness): ").strip().lower()
+search_percentage = float(input("Enter the minimum percentage threshold (e.g., 50): ").strip())
 
-result_path = r"results"
-# file_name = f"PG{id}_counts.txt"
-# full_path = os.path.join(text_folder_path, file_name) 
+results_folder = "results"
+matching_files = []
+
+for filename in os.listdir(results_folder):
+    if filename.startswith("emotion_percentage_") and filename.endswith(".tsv"):
+        file_path = os.path.join(results_folder, filename)
+
+        # Step 3: Open each file and check the percentage for the given emotion
+        with open(file_path, 'r', encoding='utf-8') as file:
+            reader = csv.reader(file, delimiter='\t')
+            next(reader)  # Skip header row
+            
+            for row in reader:
+                emotion, count, percentage = row
+                if emotion.lower() == search_emotion:
+                    if float(percentage) > search_percentage:
+                        matching_files.append(filename)
+                        break  # No need to check further in this file
+
+# Step 4: Print results
+if matching_files:
+    print("\nFiles where", search_emotion, "has a percentage higher than", search_percentage, ":")
+    for file in matching_files:
+        print(file)
+else:
+    print("\nNo matching files found.")
