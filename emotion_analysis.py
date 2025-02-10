@@ -13,7 +13,7 @@ import seaborn as sns
 try:    
     import nltk
 except ImportError:
-    subprocess.check_call(["pip", "install", "spacy"])
+    subprocess.check_call(["pip", "install", "nltk"])
 
 nltk.download('stopwords')
 from nltk.corpus import stopwords
