@@ -10,7 +10,11 @@ except ImportError:
     from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import seaborn as sns
-import nltk
+try:    
+    import nltk
+except ImportError:
+    subprocess.check_call(["pip", "install", "spacy"])
+
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 try:
