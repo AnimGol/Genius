@@ -14,7 +14,7 @@ try:
     import nltk
 except ImportError:
     subprocess.check_call(["pip", "install", "nltk"])
-
+    import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 try:
