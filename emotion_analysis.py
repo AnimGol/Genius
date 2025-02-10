@@ -55,7 +55,7 @@ else:
     print("File found! Processing...")
 
     # Read the file into a DataFrame
-    df = pd.read_csv(full_path, sep="\t", names=["word", "count"], engine="python")
+    df = pd.read_csv(full_path, sep="\t", names=["word", int(count)], engine="python")
 
     # Lemmatize the words
     df["lemma"] = df["word"].apply(lemmatize_word)
