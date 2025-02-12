@@ -30,16 +30,17 @@ if not os.path.exists(full_path):
 else:
     print("File found! Processing...")
 
-    # Read the file into a DataFrame
-    df = pd.read_csv(full_path, sep=" ", names=["word", "count"], engine="python")
+    # Read the file into a DataFrame, skipping the first row (header)
+    df = pd.read_csv(full_path, sep="\t", names=["word", "count"], engine="python", header=None, skiprows=1)
 
     # Lemmatize the words
     df["lemma"] = df["word"].apply(lemmatize_word)
 
-    # Save the updated file
+    # Create a new DataFrame with only the lemma and count columns
+    df_final = df[["lemma", "count"]]
+
+    # Save the updated file without headers
     output_file = f"PG{id}_counts_lemmatized.txt"
-    df.to_csv(os.path.join(text_folder_path, output_file), sep=" ", index=False)
+    df_final.to_csv(os.path.join(text_folder_path, output_file), sep="\t", index=False, header=False)
 
     print(f"Lemmatized file saved as {output_file}")
-
-
