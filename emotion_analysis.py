@@ -283,8 +283,34 @@ genius2_link = os.path.join(output_dir, f"wordcloud_nonstop_{id}.png")
 genius3_link = os.path.join(output_dir, f"barchart{id}.png")
 
 # working on interactive features
-search_emotion = input("Enter the emotion you want to search for (e.g., joy, sadness): ").strip().lower()
-search_percentage = float(input("Enter the minimum percentage threshold (e.g., 50): ").strip())
+
+valid_emotions = ['joy', 'sadness', 'trust', 'surprise', 'fear', 'disgust', 'anticipation', 'anger', 'negative', 'positive']
+
+# Function to validate emotion input
+def validate_emotion_input():
+    while True:
+        search_emotion = input("Enter the emotion you want to search for (joy, sadness, trust, surprise, fear, disgust, anticipation, anger, negative, positive): ").strip().lower()
+        if search_emotion in valid_emotions:
+            return search_emotion
+        else:
+            print(f"Invalid emotion! Please choose one of the following: {', '.join(valid_emotions)}")
+
+# Function to validate percentage input
+def validate_percentage_input():
+    while True:
+        percentage_input = input("Enter the minimum percentage threshold (e.g., 50): ").strip()
+        # Remove any non-numeric characters (e.g., '%')
+        percentage_input = ''.join(filter(str.isdigit, percentage_input))
+        if percentage_input:  # Check if the input is not empty
+            return float(percentage_input)
+        else:
+            print("Invalid input! Please enter a valid number (e.g., 50).")
+
+# Use the validation functions in your code
+search_emotion = validate_emotion_input()
+search_percentage = validate_percentage_input()
+
+
 
 results_folder = "results"
 matching_files = []
