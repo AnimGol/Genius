@@ -1,5 +1,6 @@
 # Import necessary modules and classes
 import emotion_analysis
+from fastapi.responses import FileResponse
 from fastapi import FastAPI, Request, Form, HTTPException, Depends
 from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -165,7 +166,7 @@ class User(BaseModel):
 # Login page (GET request)
 @app.get("/login", response_class=HTMLResponse) # "/login" is a path parameter
 async def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request}) # In curly brackets "request" is the key and request is the value.
+        return templates.TemplateResponse("login.html", {"request": request}) # In curly brackets "request" is the key and request is the value.
 
 
 @app.post("/login")
