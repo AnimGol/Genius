@@ -39,7 +39,7 @@ def lemmatize_word(word):
     doc = nlp(word)
     return doc[0].lemma_ if doc else word  # Ensure it returns the original word if empty
 
-def perform_text_analysis(id, bool: cli):
+def perform_text_analysis(id, bool: CLI):
     if CLI:
         print ("Please write the ID (e.g., 10 or 14). Please choose a number that is availavle in the folder of Counts.")
         id = input (). strip ()
