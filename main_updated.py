@@ -29,7 +29,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/favicon.ico")
 async def favicon():
-    return FileResponse("static/favicon.ico")
+        return FileResponse("static/favicon.ico")
 
 router = APIRouter() # From here downwards, I've imported emotion_analysis to this "main_ted" file.
 
