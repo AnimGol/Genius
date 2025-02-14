@@ -39,7 +39,7 @@ def lemmatize_word(word):
     doc = nlp(word)
     return doc[0].lemma_ if doc else word  # Ensure it returns the original word if empty
 
-def perform_text_analysis(id, bool: CLI):
+def perform_text_analysis(id, CLI: bool):
     if CLI:
         print ("Please write the ID (e.g., 10 or 14). Please choose a number that is availavle in the folder of Counts.")
         id = input (). strip ()
@@ -350,7 +350,7 @@ def main_menu():
         choice = input("Enter your choice (1, 2, or 3): ").strip()
 
         if choice == "1":
-            perform_text_analysis()
+            perform_text_analysis(None, True)
         elif choice == "2":
             find_emotions()
         elif choice == "3":
