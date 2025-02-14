@@ -39,9 +39,10 @@ def lemmatize_word(word):
     doc = nlp(word)
     return doc[0].lemma_ if doc else word  # Ensure it returns the original word if empty
 
-def perform_text_analysis():
-    print ("Please write the ID (e.g., 10 or 14). Please choose a number that is availavle in the folder of Counts.")
-    id = input (). strip ()
+def perform_text_analysis(id, bool: cli):
+    if CLI:
+        print ("Please write the ID (e.g., 10 or 14). Please choose a number that is availavle in the folder of Counts.")
+        id = input (). strip ()
 
     text_folder_path = "SPGC-counts-2018-07-18"
     file_name = f"PG{id}_counts.txt"
