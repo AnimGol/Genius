@@ -41,7 +41,7 @@ def lemmatize_word(word):
 
 def perform_text_analysis(id, CLI: bool):
     if CLI:
-        print ("Please write the ID (e.g., 10 or 14). Please choose a number that is availavle in the folder of Counts.")
+        print ("Please write the ID (e.g., 10 or 14). Please choose a number that is available in the folder of Counts.")
         id = input (). strip ()
 
     text_folder_path = "SPGC-counts-2018-07-18"
