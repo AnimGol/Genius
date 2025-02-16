@@ -4,16 +4,14 @@
 
 This program is designed for researchers, linguists, or anyone interested in text analysis. It analyze texts for emotional content and word frequency and provide the results in visualized formats. It can also search in the texts to find out in which texts a particular emotion appeared more than a specific percentage.
 
-Here are some of the features of this program:
-- In this program, Standardized Gutenberg Project Corpus (SGPC) was used to collect necessary files in our database named "Genius" which is a SQLite relational database and is used to analyze different texts provided there. 
-- The program uses GUI (FastAPI) and contains a user-management system. After a successful login, users can use the program and see the analysis.
-- The program uses the NRC Emotion Lexicon to analyze emotions. 
+ 
 
 
 
 
 ## Requirements
 - Python 3.12
+- Command Prompt (Windows) or Terminal (macOS/Linux)
 - The files on the "Genius" repository on Github (including "SPGC-counts-2018-07-18", "styles.css" located in the "static" folder, "Genius.db", "NRC-Emotion-Lexicon-Wordlevel-v0.92.txt", "main_updated.py" and "emotion_analysis.py")
 - External Libraries:
    SpaCy
@@ -23,9 +21,11 @@ Here are some of the features of this program:
    passlib
    pythn-multipart
    bcrypt
+- Ensure that the `en_core_web_lg` model is installed for SpaCy. You can install it using the command:
+  ```bash
+  python -m spacy download en_core_web_lg
 
 
-- Recommended IDE: ?
 
 
 
@@ -42,13 +42,13 @@ Here are some of the features of this program:
 2. Navigate to your cloned repository in your pc.
 3. Install the required libraries, mentioned above.
 4. Run this command: uvicorn main_updated:app --reload.
-5. Open the URL link provided there (Usually http://127.0.0.1:8000)and add "/register#/" to the end of the link.
+5. Open the URL link provided there (Usually http://127.0.0.1:8000 ) and add "/register#/" to the end of the link.
 
 
 
 ## Output
 The program creates the following output files:
-- Lemmatized version of the file (name format: PG{text id number}_counts_lemmatized.txt, ex. PG2_counts_lemmatized.txt): This file includes 2 columns. The first column contains the lemmas and the second one the count of the related lemma. This file is saved in the folder of "SPGC-counts-2018-07-18".
+- Lemmatized version of the file (name format: PG{text id number}_counts_lemmatized.txt, ex. PG2_counts_lemmatized.txt): This file includes 2 columns. The first column contains the base forms of words (lemmas) and the second column contains their frequency counts. This file is saved in the folder of "SPGC-counts-2018-07-18".
 - (name format: emotion_analysis_{text id number}.tsv, ex. emotion_analysis_2.tsv): This file has 3 columns, including lemmas (although the header is "word"), counts and emotions respectively. This file is saved in the "result" folder.
 - (name format: emotion_percentage_{text id number}.tsv, ex. emotion_percentage_2.tsv): This file also has 3 columns including emotions, their counts and their percentages respectively. This file is saved in the "result" folder.
 - Bar chart for emotions (name format: barchart{text id number}.png, ex.barchart2.png): This barchart depicts the frequency of each emotion. It is saved in the "result" folder.
@@ -58,7 +58,10 @@ The program creates the following output files:
 
 
 ## Program Description
-- ** ? **
+Here are some of the features of this program:
+- In this program, Standardized Gutenberg Project Corpus (SGPC) was used to collect necessary files in our database named "Genius" which is a SQLite relational database and is used to analyze different texts provided there. 
+- The program uses GUI (FastAPI) and contains a user-management system. After a successful login, users can use the program and see the analysis.
+- The program uses the NRC Emotion Lexicon to analyze emotions.
 
 
 
