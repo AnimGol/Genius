@@ -1,11 +1,15 @@
 # Text Analysis Program - README
 
 ## Introduction: What does the program do?
-This Program connects to our SQLite relational database named "Genius" and can analyze different texts provided there. Then the text can be analyzed for emotions and most frequent words.
-- It can also search in the texts to find out in which texts a certain emotion appeared more than a specific percentage.
-The program uses GUI and contains a user-management system. After a successful login, users can use the program and see the analysis.
-The program uses the NRC Emotion Lexicon for analyzing emotions. 
-Standardized Gutenberg Project Corpus (SGPC) was used to collect necessary files in our database.
+
+This program is designed for researchers, linguists, or anyone interested in text analysis. It analyze texts for emotional content and word frequency and provide the results in visualized formats. It can also search in the texts to find out in which texts a particular emotion appeared more than a specific percentage.
+
+Here are some of the features of this program:
+- In this program, Standardized Gutenberg Project Corpus (SGPC) was used to collect necessary files in our database named "Genius" which is a SQLite relational database and is used to analyze different texts provided there. 
+- The program uses GUI (FastAPI) and contains a user-management system. After a successful login, users can use the program and see the analysis.
+- The program uses the NRC Emotion Lexicon to analyze emotions. 
+
+
 
 
 ## Requirements
