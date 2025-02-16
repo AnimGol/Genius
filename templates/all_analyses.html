@@ -1,0 +1,27 @@
+<!-- all_analyses.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Analyses</title>
+</head>
+<body>
+    <h1>All Users' Analyses (Admin Only)</h1>
+    <table border="1">
+        <tr>
+            <th>Upload ID</th>
+            <th>Username</th>
+            <th>Text ID</th>
+            <th>Analysis Results (JSON)</th>
+        </tr>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row[0] }}</td> <!-- upload_id -->
+            <td>{{ row[1] }}</td> <!-- username -->
+            <td>{{ row[2] }}</td> <!-- text_id -->
+            <td>{{ row[3] }}</td> <!-- analysis_results -->
+        </tr>
+        {% endfor %}
+    </table>
+    <p><a href="/dashboard">Back to Dashboard</a></p>
+</body>
+</html>
