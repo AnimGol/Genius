@@ -1,5 +1,6 @@
 # Import necessary modules and classes
 import emotion_analysis
+from datetime import datetime, timedelta
 from fastapi.responses import FileResponse
 from fastapi import FastAPI, Request, Form, HTTPException, Depends
 from fastapi.responses import RedirectResponse, HTMLResponse
@@ -17,6 +18,10 @@ from passlib.context import CryptContext
 import sqlite3
 from sqlite3 import Error
 import os
+from fastapi import FastAPI, Depends, HTTPException, status, Request, Response
+from fastapi.responses import JSONResponse
+import uvicorn
+import csv
 
 # To import emotion_analysis in this main_ted file
 from fastapi import APIRouter
@@ -28,30 +33,94 @@ app = FastAPI()
 # Serve the static folder (for favicon.ico)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.get("/favicon.ico")
-async def favicon():
-        return FileResponse("static/favicon.ico")
+# @app.get("/favicon.ico")
+# async def favicon():
+#         return FileResponse("static/favicon.ico")
 
-router = APIRouter() # From here downwards, I've imported emotion_analysis to this "main_ted" file.
+###################################
+#       EMOTIONAL ANALYSIS        #
+###################################
 
-@router.get("/emotion-analysis/{text_id}")
-async def run_emotion_analysis(text_id: str):
+# 1) Show a simple form for the user to input the text_id
+@app.get("/analysis-form", response_class=HTMLResponse)
+async def analysis_form(request: Request):
+    user = request.session.get("user")  # Check if user is logged in
+    if not user:
+        return RedirectResponse("/login", status_code=302)
+    return templates.TemplateResponse("analysis_form.html", {"request": request})  # Show the form
+
+# 2
+@app.get("/analysis-menu", response_class=HTMLResponse)
+async def show_analysis_menu(request: Request):
+    user = request.session.get("user")
+    if not user:
+        return RedirectResponse("/login", status_code=302)
+
+    # ✅ Call `main_menu()` to display menu options
+    menu_text = emotion_analysis.main_menu()  # This should return a menu prompt
+
+    return templates.TemplateResponse("analysis_menu.html", {"request": request, "menu_text": menu_text})
+
+
+@app.post("/select-analysis-option", response_class=HTMLResponse)
+async def process_menu_option(request: Request, option: str = Form(...)):
+    user = request.session.get("user")
+    if not user:
+        return RedirectResponse("/login", status_code=302)
+
+    if option == "1":
+        return templates.TemplateResponse("enter_text_id.html", {"request": request})
+    elif option == "2":
+        return RedirectResponse("/find-emotions", status_code=302)
+    elif option == "3":
+        return RedirectResponse("/logout", status_code=302)
+    else:
+        return JSONResponse(content={"message": "Invalid option, please enter a valid choice."})
+
+
+@app.post("/start-analysis", response_class=HTMLResponse)
+async def perform_analysis(request: Request, text_id: str = Form(...)):
+    user = request.session.get("user")
+    if not user:
+        return RedirectResponse("/login", status_code=302)
+
+    # 1) Call the updated function from emotion_analysis
     try:
-        file_path = f"SPGC-counts-2018-07-18/PG{text_id}_counts.txt"
-        print(f"Looking for file at: {os.path.abspath(file_path)}")  # Debugging line
-        # Call the analysis function from emotion_analysis.py
-        result = emotion_analysis.analysis(f"SPGC-counts-2018-07-18/PG{text_id}_counts.txt")
-        #result = emotion_analysis.analysis(file_path)
-        return {"text_id": text_id, "analysis": result}
-
-    except FileNotFoundError:
-        #raise HTTPException(status_code=404, detail="File not found")
-        raise HTTPException(status_code=404, detail=f"File not found: {file_path}")  # Show missing file name
-
+        # This now returns a dictionary (analysis_summary)
+        analysis_dict = emotion_analysis.perform_text_analysis(text_id, CLI=False)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-app.include_router(router) # This is the last line of code to import emtion_analysis in this main_ted file.
+    # 2) Convert the results to JSON (or a simple string) for storage
+    import json
+    analysis_results_json = json.dumps(analysis_dict)  
+
+    # 3) Find the current user's user_id
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT user_id FROM users WHERE username = ?", (user,))
+    user_data = cursor.fetchone()
+    if not user_data:
+        conn.close()
+        raise HTTPException(status_code=404, detail="User not found in DB.")
+    user_id = user_data[0]
+
+    # 4) Insert a new row into uploaded_texts to save the analysis
+    cursor.execute("""
+        INSERT INTO uploaded_texts (user_id, content, analysis_results)
+        VALUES (?, ?, ?)
+    """, (user_id, text_id, analysis_results_json))
+
+    conn.commit()
+    conn.close()
+
+    # 5) Return a template with the analysis results
+    return templates.TemplateResponse(
+        "analysis_result.html",
+        {"request": request, "analysis": analysis_dict}
+    )
+
 
 
 #models.base.metadata.create_all(bind=engine) # It will create a DB and table if they don't already exist.
@@ -71,6 +140,136 @@ app.add_middleware(SessionMiddleware, secret_key="your_secret_key")
 
 # Set up templates
 templates = Jinja2Templates(directory="templates")
+
+
+
+@app.get("/my-analyses", response_class=HTMLResponse)
+async def my_analyses(request: Request):
+    user = request.session.get("user")
+    if not user:
+        return RedirectResponse("/login", status_code=302)
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    # Get user_id
+    cursor.execute("SELECT user_id FROM users WHERE username = ?", (user,))
+    user_data = cursor.fetchone()
+    if not user_data:
+        conn.close()
+        raise HTTPException(status_code=404, detail="User not found in the .")
+    user_id = user_data[0]
+
+    # Fetch the rows for this user
+    cursor.execute("SELECT upload_id, content, analysis_results FROM uploaded_texts WHERE user_id = ?", (user_id,))
+    rows = cursor.fetchall()
+    conn.close()
+
+    # Convert them to a structure you can use in a template
+    # Or just return as JSON for testing
+    return templates.TemplateResponse(
+        "my_analyses.html",
+        {"request": request, "analyses": rows}
+    )
+
+@app.get("/all-analyses", response_class=HTMLResponse)
+async def get_all_analyses(request: Request):
+    current_user = request.session.get("user")
+    if not current_user:
+        return RedirectResponse("/login", status_code=302)
+
+    # Check admin
+    if not is_admin(current_user):
+        # If user is not admin, redirect or raise an error
+        return RedirectResponse("/dashboard", status_code=302)
+
+    # If admin, fetch all analyses from all users
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT 
+            uploaded_texts.upload_id,
+            users.username,
+            uploaded_texts.content AS text_id,
+            uploaded_texts.analysis_results
+        FROM uploaded_texts
+        JOIN users ON uploaded_texts.user_id = users.user_id
+    """)
+    rows = cursor.fetchall()
+    conn.close()
+
+    # Render them in a new template
+    return templates.TemplateResponse(
+        "all_analyses.html",
+        {"request": request, "rows": rows}
+    )
+
+@app.get("/find-emotions", response_class=HTMLResponse)
+async def find_emotions_form(request: Request):
+    """
+    Show a form to allow the user to input an emotion and a threshold.
+    """
+    user = request.session.get("user")  # Check if user is logged in
+    if not user:
+        return RedirectResponse("/login", status_code=302)
+
+    # Render a simple form asking for emotion and threshold
+    return templates.TemplateResponse(
+        "find_emotions_form.html",
+        {"request": request}
+    )
+
+
+@app.post("/find-emotions", response_class=HTMLResponse)
+async def process_find_emotions(
+    request: Request,
+    emotion: str = Form(...),
+    threshold: float = Form(...)
+):
+    """
+    Process the form data, scan the .tsv files in the 'results' folder,
+    and look for any file where the given emotion has a percentage higher
+    than the provided threshold.
+    """
+    user = request.session.get("user")
+    if not user:
+        return RedirectResponse("/login", status_code=302)
+
+    # Directory where your emotion_percentage_*.tsv files are saved
+    results_folder = "results"
+    matching_files = []
+
+    # Scan through each file looking for the specified emotion with percentage > threshold
+    for filename in os.listdir(results_folder):
+        if filename.startswith("emotion_percentage_") and filename.endswith(".tsv"):
+            file_path = os.path.join(results_folder, filename)
+            with open(file_path, 'r', encoding='utf-8') as file:
+                reader = csv.reader(file, delimiter='\t')
+                next(reader)  # skip header: Emotion, Count, Percentage
+
+                for row in reader:
+                    if len(row) < 3:
+                        continue
+
+                    row_emotion, row_count, row_percentage = row
+                    if row_emotion.lower() == emotion.lower():
+                        try:
+                            if float(row_percentage) > threshold:
+                                matching_files.append(filename)
+                                break  # Stop scanning this file, move to next
+                        except ValueError:
+                            # If row_percentage isn't convertible to float
+                            pass
+
+    # Render a results page
+    return templates.TemplateResponse(
+        "find_emotions_results.html",
+        {
+            "request": request,
+            "emotion": emotion,
+            "threshold": threshold,
+            "matching_files": matching_files
+        }
+    )
 
 # In-memory user database (for demonstration purposes)
 users_db = {}
@@ -109,6 +308,7 @@ def initialize_db():
             hashed_password TEXT NOT NULL,
             role TEXT NOT NULL CHECK(role IN ('admin', 'user'))
         )"""
+
     )
     cursor.execute(
         """CREATE TABLE IF NOT EXISTS uploaded_texts (
@@ -154,6 +354,16 @@ class Role(str, Enum):
     user: "user"
     student: "student"
 
+def is_admin(username: str) -> bool:
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT role FROM users WHERE username = ?", (username,))
+    result = cursor.fetchone()
+    conn.close()
+    if result and result[0] == 'admin':
+        return True
+    return False
+
 # Models
 class User(BaseModel):
 #   id: Optional [UUID] = uuid4()
@@ -169,8 +379,9 @@ async def login_page(request: Request):
         return templates.TemplateResponse("login.html", {"request": request}) # In curly brackets "request" is the key and request is the value.
 
 
+
 @app.post("/login")
-async def login_user(I: Request, username: str = Form(...), password: str = Form(...)):
+async def login_user(request: Request, username: str = Form(...), password: str = Form(...)):
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
@@ -198,15 +409,79 @@ async def dashboard(request: Request):
     user = request.session.get("user")
     if not user:
         return RedirectResponse("/login")
-    return templates.TemplateResponse("dashboard.html", {"request": request, "user": user})
 
+    # Check the  from DB
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT role FROM users WHERE username = ?", (user,))
+    result = cursor.fetchone()
+    conn.close()
+
+    user_role = result[0] if result else "user"
+
+    return templates.TemplateResponse(
+        "dashboard.html",
+        {
+            "request": request,
+            "user": user,
+            "role": user_role
+        }
+    )
+
+@app.get("/users-list", response_class=HTMLResponse)
+async def show_users_list(request: Request):
+    current_user = request.session.get("user")
+    if not current_user:
+        return RedirectResponse("/login", status_code=302)
+
+    # Check if admin
+    if not is_admin(current_user):
+        return RedirectResponse("/dashboard", status_code=302)
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT user_id, username, role FROM users")
+    users_rows = cursor.fetchall()
+    conn.close()
+
+    return templates.TemplateResponse(
+        "users_list.html",
+        {"request": request, "users": users_rows}
+    )
+
+# Dictionary to store active sessions
+sessions = {}
+TIMEOUT_MINUTES = 3  # 3-minute timeout
+
+def get_current_user(request: Request):
+    session_token = request.cookies.get("session_token")
+    if not session_token or session_token not in sessions:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+    
+    session_info = sessions[session_token]
+    if datetime.utcnow() - session_info["last_active"] > timedelta(minutes=TIMEOUT_MINUTES):
+        del sessions[session_token]  # Remove session on timeout
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired. Please log in again.")
+    
+    # Update last active time
+    sessions[session_token]["last_active"] = datetime.utcnow()
+    return session_info["user"]
+
+@app.post("/login")
+def login(response: Response, username: str):
+    session_token = f"token_{username}"  # Simple token generation (should use a secure method)
+    sessions[session_token] = {"user": username, "last_active": datetime.utcnow()}
+    response.set_cookie(key="session_token", value=session_token)
+    return {"message": "Login successful", "session_token": session_token}
 
 # Logout and thank-you page
-@app.get("/logout", response_class=HTMLResponse)
-async def logout(request: Request):
-    request.session.clear()
-    return templates.TemplateResponse("thank_you.html",
-                                      {"request": request, "message": "Thank you for using the system!"})
+@app.get("/logout")
+def logout(request: Request, response: Response):
+    session_token = request.cookies.get("session_token")
+    if session_token and session_token in sessions:
+        del sessions[session_token]
+        response.delete_cookie("session_token")
+    return JSONResponse(content={"message": "Thank you for using our program! You have been logged out."})
 
 
 @app.get("/register", response_class=HTMLResponse)
@@ -214,13 +489,23 @@ async def register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
 
-@app.post("/register")
+@app.post("/register", response_class=HTMLResponse)
 async def register_user(
-        name: str = Form(...),
-        username: str = Form(...),
-        password: str = Form(...)
+    request: Request,
+    name: str = Form(...),
+    username: str = Form(...),
+    password: str = Form(...),
+    role: str = Form(...)          # <-- NEW
 ):
+    print("Form data received:", name, username, password, role)  # Debugging line
     hashed_password = pwd_context.hash(password)  # Hash the password before storing
+
+    # Validate the role to ensure it’s either 'user' or 'admin'
+    if role not in ("user", "admin"):
+        return templates.TemplateResponse(
+            "register.html",
+            {"request": request, "message": "Invalid role selection."}
+        )
 
     try:
         conn = sqlite3.connect(DB_PATH)
@@ -230,23 +515,30 @@ async def register_user(
         cursor.execute("SELECT 1 FROM users WHERE username = ?", (username,))
         if cursor.fetchone():
             conn.close()
-            raise HTTPException(status_code=400, detail="Username already exists")
+            return templates.TemplateResponse(
+                "register.html",
+                {"request": request, "message": "Username already exists"}
+            )
 
-        # Insert the new user with default role = 'user'
+        # Insert the new user with the chosen role
         cursor.execute(
             "INSERT INTO users (name, username, hashed_password, role) VALUES (?, ?, ?, ?)",
-            (name, username, hashed_password, "user")
+            (name, username, hashed_password, role)
         )
         conn.commit()
         conn.close()
 
-        return {"message": "User registered successfully"}
+        return templates.TemplateResponse(
+            "register.html",
+            {"request": request, "message": "User registered successfully!"}
+        )
 
     except sqlite3.Error as e:
         print(f"Database error: {e}")
-        raise HTTPException(status_code=500, detail="Database error occurred")
-
-""
+        return templates.TemplateResponse(
+            "register.html",
+            {"request": request, "message": "Database error occurred"}
+        )
 # User Registration
 @app.post("/register")
 #async def register_user(user: User):
