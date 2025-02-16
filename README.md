@@ -21,6 +21,12 @@ This program is designed for researchers, linguists, or anyone interested in tex
    passlib
    pythn-multipart
    bcrypt
+   Pandas
+   WordCloud
+   Matplotlib
+   Seaborn
+   NLTK
+  
 - Ensure that the `en_core_web_lg` model is installed for SpaCy. You can install it using the command:
   ```bash
   python -m spacy download en_core_web_lg
