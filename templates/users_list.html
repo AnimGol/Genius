@@ -1,0 +1,25 @@
+<!-- users_list.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Users (Admin)</title>
+</head>
+<body>
+    <h1>All Registered Users (Admin Only)</h1>
+    <table border="1">
+        <tr>
+            <th>User ID</th>
+            <th>Username</th>
+            <th>Role</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user[0] }}</td>
+            <td>{{ user[1] }}</td>
+            <td>{{ user[2] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p><a href="/dashboard">Back to Dashboard</a></p>
+</body>
+</html>
