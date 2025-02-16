@@ -1,0 +1,33 @@
+<!-- dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    ...
+</head>
+<body>
+    <h1>Welcome, {{ user }}!</h1>
+    <h2>Please choose a task:</h2>
+    <form action="/select-analysis-option" method="post">
+        <label>
+            <input type="radio" name="option" value="1"> 1. Text Analysis
+        </label><br>
+        <label>
+            <input type="radio" name="option" value="2"> 2. Find Emotions
+        </label><br>
+        <label>
+            <input type="radio" name="option" value="3"> 3. Exit
+        </label><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <!-- If user is admin, show a link to view all analyses or all users -->
+    {% if role == 'admin' %}
+        <p>
+            <a href="/all-analyses">View ALL Analyses</a> |
+            <a href="/users-list">View ALL Users</a>
+        </p>
+    {% endif %}
+
+    <a href="/logout">Logout</a>
+</body>
+</html>
