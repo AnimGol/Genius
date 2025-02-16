@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emotional Analysis</title>
+</head>
+<body>
+    <h1>Enter the Text ID for Emotional Analysis</h1>
+    <form method="POST" action="/analysis">
+        <label for="text_id">Text ID (e.g., 10 or 14):</label>
+        <input type="text" name="text_id" id="text_id" required>
+        <button type="submit">Analyze</button>
+    </form>
+</body>
+</html>
