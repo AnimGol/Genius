@@ -31,9 +31,10 @@ Here are some of the features of this program:
 
 
 ### Installation Instructions
-1. Install Python 3.12 if it is not already installed.
-?
-
+1. Install Python 3.12 if it is not already installed, from the official Python website: python.org.
+2. Install the required libraries using pip. (Run "pip install spacy uvicorn fastapi itsdangerous passlib python-multipart bcrypt" on your terminal or Command Prompt)
+3. Download the en_core_web_lg model for SpaCy: python -m spacy download en_core_web_lg
+4. Clone the repository to your pc.
 
 
 ## How to Run the Program
