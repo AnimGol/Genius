@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Analyses</title>
+</head>
+<body>
+    <h1>Your Analyses</h1>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Text ID</th>
+            <th>Analysis Results</th>
+        </tr>
+        {% for row in analyses %}
+        <tr>
+            <td>{{ row[0] }}</td> <!-- upload_id -->
+            <td>{{ row[1] }}</td> <!-- content (the text_id) -->
+            <td>{{ row[2] }}</td> <!-- analysis_results (JSON or string) -->
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
