@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emotion Analysis Menu</title>
+</head>
+<body>
+    <h1>Emotion Analysis</h1>
+    <p>{{ menu_text }}</p> <!-- ✅ Show the menu options here -->
+    
+    <form action="/select-analysis-option" method="post">
+        <label for="option">Enter your choice:</label>
+        <input type="text" id="option" name="option">
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
