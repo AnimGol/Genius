@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emotion Search Results</title>
+</head>
+<body>
+    <h1>Search Results for Emotion: {{ emotion }}</h1>
+    <p>Threshold: {{ threshold }}%</p>
+
+    {% if matching_files %}
+        <h2>Matching files:</h2>
+        <ul>
+        {% for f in matching_files %}
+            <li>{{ f }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <h2>No files found that exceed that threshold.</h2>
+    {% endif %}
+
+    <a href="/analysis-menu">Go Back to  Menu</a>
+</body>
+</html>
