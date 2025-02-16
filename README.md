@@ -38,7 +38,7 @@ Standardized Gutenberg Project Corpus (SGPC) was used to collect necessary files
 3. Install the required libraries, mentioned above.
 4. Run this command: uvicorn main_updated:app --reload.
 5. Open the URL link provided there (Usually http://127.0.0.1:8000)and add "/register#/" to the end of the link.
-?
+
 
 
 ## Output
