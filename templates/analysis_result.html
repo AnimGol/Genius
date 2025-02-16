@@ -1,0 +1,27 @@
+<!-- analysis_result.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analysis Result</title>
+</head>
+<body>
+    <h1>Analysis Results for Text ID: {{ analysis["text_id"] }}</h1>
+    <p>Total word count: {{ analysis["word_count"] }}</p>
+
+    <h2>Emotions Count:</h2>
+    <ul>
+    {% for emotion, count in analysis["emotions"].items() %}
+      <li>{{ emotion }}: {{ count }}</li>
+    {% endfor %}
+    </ul>
+
+    <h2>Emotions Percentage:</h2>
+    <ul>
+    {% for emotion, pct in analysis["percentages"].items() %}
+      <li>{{ emotion }}: {{ pct|round(2) }}%</li>
+    {% endfor %}
+    </ul>
+
+    <p><a href="/my-analyses">View My Analyses</a></p>
+</body>
+</html>
