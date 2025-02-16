@@ -60,6 +60,8 @@ The program creates the following output files:
 ## Contact Information
 For any questions or support, please contact the following emails:
 seyedeh.golestani@stud.uni-goettingen.de
+or
 qasimhabib.314@gmail.com
+or
 alihmohammad3334@gmail.com
 
