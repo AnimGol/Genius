@@ -284,6 +284,14 @@ def perform_text_analysis(id, CLI: bool):
     genius2_link = os.path.join(output_dir, f"wordcloud_nonstop_{id}.png")
     genius3_link = os.path.join(output_dir, f"barchart{id}.png")
 
+    analysis_summary = {
+        "text_id": id,
+        "word_count": x,
+        "emotions": emotion_frequency,
+        "percentages": percentages
+    }
+    return analysis_summary
+
 # working on interactive features
 def find_emotions():
     valid_emotions = ['joy', 'sadness', 'trust', 'surprise', 'fear', 'disgust', 'anticipation', 'anger', 'negative', 'positive']
