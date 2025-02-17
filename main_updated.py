@@ -26,6 +26,9 @@ import csv
 # To import emotion_analysis in this main_ted file
 from fastapi import APIRouter
 
+###################################
+#  FASTAPI INITIALIZATION & SETUP #
+###################################
 
 # Initialize the FastAPI app
 app = FastAPI()
@@ -48,6 +51,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # that returns a dictionary with results.
 # Example: result = emotion_analysis.analysis("SPGC-counts-2018-07-18/PG10_counts.txt")
 
+#*********************************#
+#****     ANALYSIS FORM       ****#
+#*********************************#
+
 # 1) Show a simple form for the user to input the text_id
 @app.get("/analysis-form", response_class=HTMLResponse)
 async def analysis_form(request: Request):
@@ -55,6 +62,10 @@ async def analysis_form(request: Request):
     if not user:
         return RedirectResponse("/login", status_code=302)
     return templates.TemplateResponse("analysis_form.html", {"request": request})  # Show the form
+
+#*********************************#
+#****      ANALYSIS MENU      ****#
+#*********************************#
 
 # 2) Shows a simple menu to the user to select for the desired results
 @app.get("/analysis-menu", response_class=HTMLResponse)
@@ -83,6 +94,10 @@ async def process_menu_option(request: Request, option: str = Form(...)):
         return RedirectResponse("/logout", status_code=302)
     else:
         return JSONResponse(content={"message": "Invalid option, please enter a valid choice."})
+
+#*********************************#
+#****     START ANALYSIS      ****#
+#*********************************#
 
 # To perform analysis for the user
 @app.post("/start-analysis", response_class=HTMLResponse)
@@ -161,6 +176,9 @@ app.add_middleware(SessionMiddleware, secret_key="your_secret_key")
 # Set up templates
 templates = Jinja2Templates(directory="templates")
 
+#*********************************#
+#****       MY ANALYSES       ****#
+#*********************************#
 
 #Allow users to view their own analyses
 @app.get("/my-analyses", response_class=HTMLResponse)
@@ -217,6 +235,10 @@ async def my_analyses(request: Request):
         {"request": request, "analyses": analyses_with_images}
     )
 
+#*********************************#
+#****     ALL ANALYSES        ****#
+#*********************************#
+
 @app.get("/all-analyses", response_class=HTMLResponse)
 async def get_all_analyses(request: Request):
     current_user = request.session.get("user")
@@ -248,6 +270,10 @@ async def get_all_analyses(request: Request):
         "all_analyses.html",
         {"request": request, "rows": rows}
     )
+
+#*********************************#
+#****    FIND EMOTIONS        ****#
+#*********************************#
 
 @app.get("/find-emotions", response_class=HTMLResponse)
 async def find_emotions_form(request: Request):
@@ -320,8 +346,8 @@ async def process_find_emotions(
 # In-memory user database (for demonstration purposes)
 users_db = {}
 
-###################################
-#       DATABASE SETUP            #
+###################################   
+#       DATABASE SETUP            #    
 ###################################
 
 # Database connection setup
@@ -398,7 +424,10 @@ initialize_db()
 # Password hashing setup
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-#Roles
+
+###################################
+#              ROLES              #
+###################################
 class Role(str, Enum):
 #   id: Optional [UUID] = uuid4
     admin: "admin"
@@ -415,14 +444,19 @@ def is_admin(username: str) -> bool:
         return True
     return False
 
-# Models
+
+###################################
+#              MODELS             #
+###################################
 class User(BaseModel):
 #   id: Optional [UUID] = uuid4()
     username: str
     password: str
     roles: List[Role]
 
-# Routes
+###################################
+#              ROUTES             #
+###################################
 
 # Login page (GET request)
 @app.get("/login", response_class=HTMLResponse) # "/login" is a path parameter
@@ -455,7 +489,7 @@ async def login_user(request: Request, username: str = Form(...), password: str 
         raise HTTPException(status_code=500, detail="Database error occurred")
 
 ###################################
-#       DASHBOARD                 #
+#             DASHBOARD           #
 ###################################
 
 # Dashboard page
