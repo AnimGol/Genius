@@ -30,6 +30,9 @@ from fastapi import APIRouter
 # Initialize the FastAPI app
 app = FastAPI()
 
+app.mount("/results", StaticFiles(directory="results"), name="results")
+
+
 # Serve the static folder (for favicon.ico)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -84,21 +87,24 @@ async def perform_analysis(request: Request, text_id: str = Form(...)):
     if not user:
         return RedirectResponse("/login", status_code=302)
 
-    # 1) Call the updated function from emotion_analysis
     try:
-        # This now returns a dictionary (analysis_summary)
+        # Perform text analysis
         analysis_dict = emotion_analysis.perform_text_analysis(text_id, CLI=False)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    # 2) Convert the results to JSON (or a simple string) for storage
+    # Convert the results to JSON for storage
     import json
-    analysis_results_json = json.dumps(analysis_dict)  
+    analysis_results_json = json.dumps(analysis_dict)
 
-    # 3) Find the current user's user_id
+    # Paths to the generated images
+    barchart_path = os.path.join("results", f"barchart{text_id}.png")
+    wordcloud_path = os.path.join("results", f"wordcloud{text_id}.png")
+    wordcloud_nonstop_path = os.path.join("results", f"wordcloud_nonstop{text_id}.png")
+
+    # Find the current user's user_id
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-
     cursor.execute("SELECT user_id FROM users WHERE username = ?", (user,))
     user_data = cursor.fetchone()
     if not user_data:
@@ -106,21 +112,30 @@ async def perform_analysis(request: Request, text_id: str = Form(...)):
         raise HTTPException(status_code=404, detail="User not found in DB.")
     user_id = user_data[0]
 
-    # 4) Insert a new row into uploaded_texts to save the analysis
+    # Insert a new row into uploaded_texts to save the analysis
     cursor.execute("""
         INSERT INTO uploaded_texts (user_id, content, analysis_results)
         VALUES (?, ?, ?)
     """, (user_id, text_id, analysis_results_json))
 
+    # Update the Works Collection table with the image paths for the correct book ID
+    id = f"PG{text_id}"  # Construct the book ID (e.g., PG10)
+    cursor.execute("""
+        UPDATE "Works Collection"
+        SET "wordcloud for Most Frequent Words" = ?,
+            "wordcloud for nonstop words" = ?,
+            "Barchart for emotion analysis" = ?
+        WHERE id = ?
+    """, (wordcloud_path, wordcloud_nonstop_path, barchart_path, id))
+
     conn.commit()
     conn.close()
 
-    # 5) Return a template with the analysis results
+    # Return a template with the analysis results
     return templates.TemplateResponse(
         "analysis_result.html",
         {"request": request, "analysis": analysis_dict}
     )
-
 
 
 #models.base.metadata.create_all(bind=engine) # It will create a DB and table if they don't already exist.
@@ -151,24 +166,50 @@ async def my_analyses(request: Request):
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
+
     # Get user_id
     cursor.execute("SELECT user_id FROM users WHERE username = ?", (user,))
     user_data = cursor.fetchone()
     if not user_data:
         conn.close()
-        raise HTTPException(status_code=404, detail="User not found in the .")
+        raise HTTPException(status_code=404, detail="User not found in DB.")
     user_id = user_data[0]
 
-    # Fetch the rows for this user
-    cursor.execute("SELECT upload_id, content, analysis_results FROM uploaded_texts WHERE user_id = ?", (user_id,))
-    rows = cursor.fetchall()
+    # Fetch the user's previous analyses
+    cursor.execute("""
+        SELECT upload_id, content, analysis_results
+        FROM uploaded_texts
+        WHERE user_id = ?
+    """, (user_id,))
+    analyses = cursor.fetchall()
+
+    # Fetch image paths from the Works Collection table for the correct book ID
+    analyses_with_images = []
+    for analysis in analyses:
+        id = f"PG{analysis[1]}"  # Construct the book ID (e.g., PG10)
+        cursor.execute("""
+            SELECT "wordcloud for Most Frequent Words", "wordcloud for nonstop words", "Barchart for emotion analysis"
+            FROM "Works Collection"
+            WHERE id = ?
+        """, (id,))
+        works = cursor.fetchone()
+
+        if works:
+            analyses_with_images.append({
+                "upload_id": analysis[0],
+                "content": analysis[1],
+                "analysis_results": analysis[2],
+                "wordcloud_path": works[0],
+                "wordcloud_nonstop_path": works[1],
+                "barchart_path": works[2]
+            })
+
     conn.close()
 
-    # Convert them to a structure you can use in a template
-    # Or just return as JSON for testing
+    # Render the my_analyses template with the user's analyses and image paths
     return templates.TemplateResponse(
         "my_analyses.html",
-        {"request": request, "analyses": rows}
+        {"request": request, "analyses": analyses_with_images}
     )
 
 @app.get("/all-analyses", response_class=HTMLResponse)
@@ -410,21 +451,59 @@ async def dashboard(request: Request):
     if not user:
         return RedirectResponse("/login")
 
-    # Check the  from DB
+    # Fetch the user's role
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT role FROM users WHERE username = ?", (user,))
     result = cursor.fetchone()
-    conn.close()
-
     user_role = result[0] if result else "user"
 
+    # Fetch the user's previous analyses
+    cursor.execute("SELECT user_id FROM users WHERE username = ?", (user,))
+    user_data = cursor.fetchone()
+    if not user_data:
+        conn.close()
+        raise HTTPException(status_code=404, detail="User not found in DB.")
+    user_id = user_data[0]
+
+    # Fetch analyses for the current user
+    cursor.execute("""
+        SELECT upload_id, content, analysis_results
+        FROM uploaded_texts
+        WHERE user_id = ?
+    """, (user_id,))
+    analyses = cursor.fetchall()
+
+    # Fetch image paths from the Works Collection table
+    query = """
+        SELECT "wordcloud for Most Frequent Words", "wordcloud for nonstop words", "Barchart for emotion analysis"
+        FROM "Works Collection"
+    """
+    print("Executing query:", query)  # Debugging: Print the query
+    cursor.execute(query)
+    works_collection = cursor.fetchall()
+    conn.close()
+
+    # Combine analyses with image paths
+    analyses_with_images = []
+    for analysis, works in zip(analyses, works_collection):
+        analyses_with_images.append({
+            "upload_id": analysis[0],
+            "content": analysis[1],
+            "analysis_results": analysis[2],
+            "wordcloud_path": works[0],
+            "wordcloud_nonstop_path": works[1],
+            "barchart_path": works[2]
+        })
+
+    # Render the dashboard template with the user's analyses and image paths
     return templates.TemplateResponse(
         "dashboard.html",
         {
             "request": request,
             "user": user,
-            "role": user_role
+            "role": user_role,
+            "analyses": analyses_with_images  # Pass analyses and image paths to the template
         }
     )
 
