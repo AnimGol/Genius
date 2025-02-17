@@ -126,7 +126,7 @@ def perform_text_analysis(id, CLI: bool):
 
     print(f"Emotion analysis saved to {output_path}")
 
-
+# This function uses the output_path, which contains words, counts, and emotions, and provides a dictionary with emotions and their counts in the text.
     def emotion_frequency (output_path):
                 emotions_in_text = {}
                 with open (output_path) as tsv_file:
