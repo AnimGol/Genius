@@ -850,7 +850,7 @@ async def test_db_connection():
         return {"error": str(e)}
 
 ###################################
-#       HELP PAGE                 #
+#            HELP PAGE            #
 ###################################
 
 #HTML-based
@@ -926,7 +926,7 @@ async def help_json():
     }
 
 ###################################
-#       USERS QUERIES             #
+#         USERS QUERIES           #
 ###################################
 
 # Users can ask queries
