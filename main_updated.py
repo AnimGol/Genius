@@ -99,8 +99,8 @@ async def perform_analysis(request: Request, text_id: str = Form(...)):
 
     # Paths to the generated images
     barchart_path = os.path.join("results", f"barchart{text_id}.png")
-    wordcloud_path = os.path.join("results", f"wordcloud{text_id}.png")
-    wordcloud_nonstop_path = os.path.join("results", f"wordcloud_nonstop{text_id}.png")
+    wordcloud_path = os.path.join("results", f"wordcloud_{text_id}.png")
+    wordcloud_nonstop_path = os.path.join("results", f"wordcloud_nonstop_{text_id}.png")
 
     # Find the current user's user_id
     conn = sqlite3.connect(DB_PATH)
@@ -771,3 +771,88 @@ async def test_db_connection():
         return {"message": "Database connected successfully!", "tables": tables}
     except Exception as e:
         return {"error": str(e)}
+
+#HTML-based
+@app.get("/help", response_class=HTMLResponse)
+async def help_page():
+    return """
+    <html>
+        <head>
+            <title>Help Page</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                h1 { color: darkblue; }
+                ul { list-style-type: none; padding: 0; }
+                li { padding: 5px 0; }
+                input, button { padding: 8px; margin-top: 10px; }
+            </style>
+            <script>
+                function searchHelp() {
+                    var query = document.getElementById("search").value.toLowerCase();
+                    var  = document.querySelectorAll("ul li");
+                    .forEach(item => {
+                        if (item.innerText.toLowerCase().includes(query)) {
+                            item.style.display = "block";
+                        } else {
+                            item.style.display = "none";
+                        }
+                    });
+                }
+            </script>
+        </head>
+        <body>
+            <h1>Help Page</h1>
+            <p>Use the following API endpoints:</p>
+
+            <input type="text" id="search" placeholder="Search..." onkeyup="searchHelp()">
+            <ul>
+                <li><b>/register</b> - Register a new user.</li>
+                <li><b>/login</b> - Log in to the system.</li>
+                <li><b>/dashboard</b> - Access your dashboard.</li>
+                <li><b>/analysis-form</b> - Perform sentiment and emotion analysis.</li>
+                <li><b>/my_analyses</b> - View previous analyses.</li>
+                <li><b>/find-emotions</b> - Search for texts based on emotions.</li>
+                <li><b>/logout</b> - Securely log out.</li>
+            </ul>
+
+            <h2>Submit a Query</h2>
+            <form method="post" action="/submit-query">
+                <input type="text" name="query" placeholder="Type your question..." required>
+                <button type="submit">Submit</button>
+            </form>
+
+            <p>Visit <a href="/docs">API Documentation</a> for more details.</p>
+        </body>
+    </html>
+    """
+
+#JSON based
+@app.get("/help-json", response_class=JSONResponse)
+async def help_json():
+    return {
+        "message": "Welcome to the Sentiment Analysis Help Page!",
+        "endpoints": {
+            "/register": "Register a new user",
+            "/login": "Log in to the system",
+            "/dashboard": "Access your dashboard",
+            "/upload-text": "Upload text files for sentiment analysis",
+            "/analysis-form": "Perform sentiment and emotion analysis",
+            "/books": "View previously analyzed books",
+            "/find-emotions": "Find texts based on emotional content",
+            "/logout": "Log out securely"
+        },
+        "docs": "Visit /docs for API documentation."
+    }
+
+
+# Users can ask queries
+queries = []
+
+@app.post("/submit-query")
+async def submit_query(query: str = Form(...)):
+    queries.append(query)
+    return {"message": "Your question has been submitted!", "total_queries": len(queries)}
+
+@app.get("/queries")
+async def get_queries():
+    return {"submitted_queries": queries}
