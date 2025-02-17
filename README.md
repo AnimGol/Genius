@@ -44,7 +44,7 @@ This program is designed for researchers, linguists, or anyone interested in tex
 
 
 ## How to Run the Program
-1. Open the cmd (or equivalent) and clone the "Genius" repository to your pc: git clone https://github.com/{yourusername}/Genius.git
+1. Open the cmd (or equivalent) and navigate to the directory where you want to clone the repository. Then clone the "Genius" repository to your pc: git clone https://github.com/{yourusername}/Genius.git
 2. Navigate to your cloned repository on your pc.
 3. Install the required libraries, mentioned above.
 4. Run this command: uvicorn main_updated:app --reload.
