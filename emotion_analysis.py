@@ -94,6 +94,7 @@ def perform_text_analysis(id, CLI: bool):
     result = emotion_dictionary(r'NRC-Emotion-Lexicon-Wordlevel-v0.92.txt')
     # print (result)
 
+    # Adding emotions to the original count file which only had words(lemmatized) and counts. It uses the result from the emotion_dictionary function.
     def analysis(full_path):
         second_lexicon = {}
         with open(full_path, 'r', encoding='utf-8') as file:
