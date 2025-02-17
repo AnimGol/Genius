@@ -5,19 +5,23 @@
 </head>
 <body>
     <h1>Your Analyses</h1>
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Text ID</th>
-            <th>Analysis Results</th>
-        </tr>
-        {% for row in analyses %}
-        <tr>
-            <td>{{ row[0] }}</td> <!-- upload_id -->
-            <td>{{ row[1] }}</td> <!-- content (the text_id) -->
-            <td>{{ row[2] }}</td> <!-- analysis_results (JSON or string) -->
-        </tr>
-        {% endfor %}
-    </table>
+    {% for analysis in analyses %}
+    <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 20px;">
+        <h3>Analysis for Text ID: {{ analysis["content"] }}</h3>
+        <p>Analysis Results: {{ analysis["analysis_results"] }}</p>
+
+        <!-- Display the bar chart -->
+        <h4>Emotion Bar Chart</h4>
+        <img src="{{ analysis['barchart_path'] }}" alt="Bar Chart" style="width: 600px; height: 400px;">
+
+        <!-- Display the word cloud -->
+        <h4>Word Cloud</h4>
+        <img src="{{ analysis['wordcloud_path'] }}" alt="Word Cloud" style="width: 600px; height: 300px;">
+
+        <!-- Display the non-stop word cloud -->
+        <h4>Non-Stop Word Cloud</h4>
+        <img src="{{ analysis['wordcloud_nonstop_path'] }}" alt="Non-Stop Word Cloud" style="width: 600px; height: 300px;">
+    </div>
+    {% endfor %}
 </body>
 </html>
