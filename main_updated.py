@@ -466,12 +466,29 @@ class User(BaseModel):
 # Login page (GET request)
 @app.get("/login", response_class=HTMLResponse) # "/login" is a path parameter
 async def login_page(request: Request):
+    """
+    Renders the login page for user authentication.
+    Args:
+        request (Request): The HTTP request object.
+    Returns:
+        TemplateResponse: Rendered login.html template.
+    """
         return templates.TemplateResponse("login.html", {"request": request}) # In curly brackets "request" is the key and request is the value.
 
 
 
 @app.post("/login")
 async def login_user(request: Request, username: str = Form(...), password: str = Form(...)):
+    """
+    Handles user login by validating credentials against the database.
+    Args:
+        request (Request): The HTTP request object.
+        username (str): The username submitted via the login form.
+        password (str): The password submitted via the login form.
+    Returns:
+        RedirectResponse: Redirects to the dashboard on successful login.
+        HTTPException: Raises 401 for invalid credentials or 500 for database errors.
+    """
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
@@ -500,6 +517,14 @@ async def login_user(request: Request, username: str = Form(...), password: str 
 # Dashboard page
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request):
+    """
+    Renders the user dashboard, displaying the latest analysis results for the logged-in user.
+    Args:
+        request (Request): The HTTP request object.
+    Returns:
+        TemplateResponse: Rendered dashboard.html template with user-specific data.
+        RedirectResponse: Redirects to the login page if the user is not authenticated.
+    """
     user = request.session.get("user")
     if not user:
         return RedirectResponse("/login")
