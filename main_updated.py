@@ -58,6 +58,14 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # 1) Show a simple form for the user to input the text_id
 @app.get("/analysis-form", response_class=HTMLResponse)
 async def analysis_form(request: Request):
+   """
+    Renders a form for users to input a text ID for emotion analysis.
+    Args:
+        request (Request): The HTTP request object.
+    Returns:
+        TemplateResponse: Rendered analysis_form.html template.
+        RedirectResponse: Redirects to the login page if the user is not authenticated.
+    """
     user = request.session.get("user")  # Check if user is logged in
     if not user:
         return RedirectResponse("/login", status_code=302)
@@ -70,6 +78,14 @@ async def analysis_form(request: Request):
 # 2) Shows a simple menu to the user to select for the desired results
 @app.get("/analysis-menu", response_class=HTMLResponse)
 async def show_analysis_menu(request: Request):
+    """
+    Displays the analysis menu options to the user.
+    Args:
+        request (Request): The HTTP request object.
+    Returns:
+        TemplateResponse: Rendered analysis_menu.html template with menu options.
+        RedirectResponse: Redirects to the login page if the user is not authenticated.
+    """
     user = request.session.get("user")
     if not user:
         return RedirectResponse("/login", status_code=302)
@@ -102,6 +118,15 @@ async def process_menu_option(request: Request, option: str = Form(...)):
 # To perform analysis for the user
 @app.post("/start-analysis", response_class=HTMLResponse)
 async def perform_analysis(request: Request, text_id: str = Form(...)):
+    """
+    Performs emotion analysis on the provided text ID and saves the results to the database.
+    Args:
+        request (Request): The HTTP request object.
+        text_id (str): The text ID submitted via the form.
+    Returns:
+        TemplateResponse: Rendered analysis_result.html template with analysis results.
+        HTTPException: Raises 404 if the user is not found or 500 for analysis errors.
+    """
     user = request.session.get("user")
     if not user:
         return RedirectResponse("/login", status_code=302)
@@ -183,6 +208,14 @@ templates = Jinja2Templates(directory="templates")
 #Allow users to view their own analyses
 @app.get("/my-analyses", response_class=HTMLResponse)
 async def my_analyses(request: Request):
+    """
+    Displays the analysis results for the logged-in user.
+    Args:
+        request (Request): The HTTP request object.
+    Returns:
+        TemplateResponse: Rendered my_analyses.html template with user-specific analysis data.
+        RedirectResponse: Redirects to the login page if the user is not authenticated.
+    """
     user = request.session.get("user") # Get current logged-in user
     if not user:
         return RedirectResponse("/login", status_code=302)
@@ -638,6 +671,14 @@ def login(response: Response, username: str):
 # Logout and thank-you page
 @app.get("/logout")
 def logout(request: Request, response: Response):
+    """
+    Logs out the user by clearing their session and deleting the session token.
+    Args:
+        request (Request): The HTTP request object.
+        response (Response): The HTTP response object.
+    Returns:
+        JSONResponse: Confirmation message indicating successful logout.
+    """
     session_token = request.cookies.get("session_token")
     if session_token and session_token in sessions:
         del sessions[session_token]
@@ -649,6 +690,13 @@ def logout(request: Request, response: Response):
 ####################################
 
 @app.get("/register", response_class=HTMLResponse)
+    """
+    Renders the user registration page.
+    Args:
+        request (Request): The HTTP request object.
+    Returns:
+        TemplateResponse: Rendered register.html template.
+    """
 async def register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
@@ -661,6 +709,17 @@ async def register_user(
     password: str = Form(...),
     role: str = Form(...)          # <-- NEW
 ):
+    """
+    Handles user registration by inserting new user data into the database.
+    Args:
+        request (Request): The HTTP request object.
+        name (str): The user's full name.
+        username (str): The desired username.
+        password (str): The user's password.
+    Returns:
+        TemplateResponse: Rendered register.html template with a success or error message.
+    """
+      
     print("Form data received:", name, username, password, role)  # Debugging line
     hashed_password = pwd_context.hash(password)  # Hash the password before storing
 
