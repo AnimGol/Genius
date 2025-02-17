@@ -43,6 +43,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 ###################################
 #       EMOTIONAL ANALYSIS        #
 ###################################
+# We assume your emotion_analysis.py has a function:
+#    def analysis(file_path: str) -> dict
+# that returns a dictionary with results.
+# Example: result = emotion_analysis.analysis("SPGC-counts-2018-07-18/PG10_counts.txt")
 
 # 1) Show a simple form for the user to input the text_id
 @app.get("/analysis-form", response_class=HTMLResponse)
@@ -52,7 +56,7 @@ async def analysis_form(request: Request):
         return RedirectResponse("/login", status_code=302)
     return templates.TemplateResponse("analysis_form.html", {"request": request})  # Show the form
 
-# 2
+# 2) Shows a simple menu to the user to select for the desired results
 @app.get("/analysis-menu", response_class=HTMLResponse)
 async def show_analysis_menu(request: Request):
     user = request.session.get("user")
@@ -64,7 +68,7 @@ async def show_analysis_menu(request: Request):
 
     return templates.TemplateResponse("analysis_menu.html", {"request": request, "menu_text": menu_text})
 
-
+# User can select the desired option from the menu that is displayed
 @app.post("/select-analysis-option", response_class=HTMLResponse)
 async def process_menu_option(request: Request, option: str = Form(...)):
     user = request.session.get("user")
@@ -80,7 +84,7 @@ async def process_menu_option(request: Request, option: str = Form(...)):
     else:
         return JSONResponse(content={"message": "Invalid option, please enter a valid choice."})
 
-
+# To perform analysis for the user
 @app.post("/start-analysis", response_class=HTMLResponse)
 async def perform_analysis(request: Request, text_id: str = Form(...)):
     user = request.session.get("user")
@@ -146,6 +150,7 @@ async def perform_analysis(request: Request, text_id: str = Form(...)):
 #        yield db
 #    finally:
 #        db.close() # Now, we'll gonna use Dependency Injection Platform on FastAPI. So, eveytime this function gets called, we want to automatically open a Db Session and automatically close it. So, in 1st line of code we add 'Depends'.
+
 # And now in all of the parameters we'll call the Dependency injection.
 # Mount static files directory
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -157,10 +162,10 @@ app.add_middleware(SessionMiddleware, secret_key="your_secret_key")
 templates = Jinja2Templates(directory="templates")
 
 
-
+#Allow users to view their own analyses
 @app.get("/my-analyses", response_class=HTMLResponse)
 async def my_analyses(request: Request):
-    user = request.session.get("user")
+    user = request.session.get("user") # Get current logged-in user
     if not user:
         return RedirectResponse("/login", status_code=302)
 
@@ -315,6 +320,10 @@ async def process_find_emotions(
 # In-memory user database (for demonstration purposes)
 users_db = {}
 
+###################################
+#       DATABASE SETUP            #
+###################################
+
 # Database connection setup
 DB_PATH = os.path.abspath("Genius.db")
 print("Database path:", DB_PATH)
@@ -385,6 +394,7 @@ finally:
 
 # Initialize the database when the app starts
 initialize_db()
+
 # Password hashing setup
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -443,6 +453,10 @@ async def login_user(request: Request, username: str = Form(...), password: str 
     except sqlite3.Error as e:
         print(f"Database error: {e}")
         raise HTTPException(status_code=500, detail="Database error occurred")
+
+###################################
+#       DASHBOARD                 #
+###################################
 
 # Dashboard page
 @app.get("/dashboard", response_class=HTMLResponse)
@@ -553,6 +567,10 @@ def login(response: Response, username: str):
     response.set_cookie(key="session_token", value=session_token)
     return {"message": "Login successful", "session_token": session_token}
 
+####################################
+#     LOG OUT AND THANK-YOU PAGE   #
+####################################
+
 # Logout and thank-you page
 @app.get("/logout")
 def logout(request: Request, response: Response):
@@ -562,6 +580,9 @@ def logout(request: Request, response: Response):
         response.delete_cookie("session_token")
     return JSONResponse(content={"message": "Thank you for using our program! You have been logged out."})
 
+####################################
+#          USER ADMIN ROLES        #
+####################################
 
 @app.get("/register", response_class=HTMLResponse)
 async def register_page(request: Request):
@@ -618,6 +639,12 @@ async def register_user(
             "register.html",
             {"request": request, "message": "Database error occurred"}
         )
+
+####################################
+#       USER REGISTRATION          #
+####################################
+
+
 # User Registration
 @app.post("/register")
 #async def register_user(user: User):
@@ -630,6 +657,11 @@ async def register_user_new(user: User):  # Change the function name
     conn.close()
     return {"message": "User registered successfully"}
 ""
+
+##########################################
+#PUT METHODS FOR UPDATING USERS AND BOOKS#
+##########################################
+
 # PUT Methods for updating users and books
 @app.put("/users/{user_id}")
 async def update_user(user_id: int, name: Optional[str] = Form(None), password: Optional[str] = Form(None)):
@@ -692,6 +724,10 @@ async def update_book(book_id: str, title: Optional[str] = Form(None), author: O
         print(f"Database error: {e}")
         raise HTTPException(status_code=500, detail="Database error occurred")
 
+####################################
+#DELETE METHODS FOR USERS AND BOOKS#
+####################################
+
 # DELETE Methods for deleting users and books
 @app.delete("/users/{user_id}")
 async def delete_user(user_id: int):
@@ -741,6 +777,10 @@ async def delete_book(book_id: str):
 #    conn.close()
 #    return {"books": books}
 
+###################################
+#              BOOKS              #
+###################################
+
 @app.get("/books", response_model=list)
 async def get_books():
     try:
@@ -757,6 +797,9 @@ async def get_books():
         raise HTTPException(status_code=500, detail=str(e))
         #return {"error": str(e)}
 
+###################################
+#       TEST DB CONNECTION        #
+###################################
 
 
 # Test database connection
@@ -771,6 +814,10 @@ async def test_db_connection():
         return {"message": "Database connected successfully!", "tables": tables}
     except Exception as e:
         return {"error": str(e)}
+
+###################################
+#       HELP PAGE                 #
+###################################
 
 #HTML-based
 @app.get("/help", response_class=HTMLResponse)
@@ -844,6 +891,9 @@ async def help_json():
         "docs": "Visit /docs for API documentation."
     }
 
+###################################
+#       USERS QUERIES             #
+###################################
 
 # Users can ask queries
 queries = []
