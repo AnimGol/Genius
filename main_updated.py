@@ -788,6 +788,12 @@ async def register_user_new(user: User):  # Change the function name
 # PUT Methods for updating users and books
 @app.put("/users/{user_id}")
 async def update_user(user_id: int, name: Optional[str] = Form(None), password: Optional[str] = Form(None)):
+    """
+    Updates the name and/or password of a user in the database.
+    Returns:
+        JSONResponse: Confirmation message indicating successful update.
+        HTTPException: Raises 404 if the user is not found or 500 for database errors.
+    """
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
@@ -819,6 +825,16 @@ async def update_user(user_id: int, name: Optional[str] = Form(None), password: 
 
 @app.put("/books/{book_id}")
 async def update_book(book_id: str, title: Optional[str] = Form(None), author: Optional[str] = Form(None)):
+    """
+    Updates the title and/or author of a book in the database.
+    Args:
+        book_id (str): The ID of the book to update.
+        title (Optional[str]): The new title of the book.
+        author (Optional[str]): The new author of the book.
+    Returns:
+        JSONResponse: Confirmation message indicating successful update.
+        HTTPException: Raises 404 if the book is not found or 500 for database errors.
+    """
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
@@ -854,6 +870,12 @@ async def update_book(book_id: str, title: Optional[str] = Form(None), author: O
 # DELETE Methods for deleting users and books
 @app.delete("/users/{user_id}")
 async def delete_user(user_id: int):
+   """
+    Deletes a user from the database.
+    Returns:
+        JSONResponse: Confirmation message indicating successful deletion.
+        HTTPException: Raises 404 if the user is not found or 500 for database errors.
+    """
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
@@ -873,6 +895,14 @@ async def delete_user(user_id: int):
 
 @app.delete("/books/{book_id}")
 async def delete_book(book_id: str):
+    """
+    Deletes a book from the database.
+    Args:
+        book_id (str): The ID of the book to delete.
+    Returns:
+        JSONResponse: Confirmation message indicating successful deletion.
+        HTTPException: Raises 404 if the book is not found or 500 for database errors.
+    """
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
@@ -945,6 +975,12 @@ async def test_db_connection():
 #HTML-based
 @app.get("/help", response_class=HTMLResponse)
 async def help_page():
+
+    """
+    Renders a help page with API endpoint descriptions and a searchable interface.
+    Returns:
+        HTMLResponse: Rendered help page with API documentation and a query submission form.
+    """
     return """
     <html>
         <head>
@@ -999,6 +1035,11 @@ async def help_page():
 #JSON based
 @app.get("/help-json", response_class=JSONResponse)
 async def help_json():
+    """
+    Provides API endpoint descriptions in JSON format.
+    Returns:
+        JSONResponse: A dictionary containing API endpoint descriptions.
+    """
     return {
         "message": "Welcome to the Sentiment Analysis Help Page!",
         "endpoints": {
@@ -1023,9 +1064,21 @@ queries = []
 
 @app.post("/submit-query")
 async def submit_query(query: str = Form(...)):
+    """
+    Submits a user query and stores it in the queries list.
+    Args:
+        query (str): The user's query.
+    Returns:
+        JSONResponse: Confirmation message and the total number of queries submitted.
+    """
     queries.append(query)
     return {"message": "Your question has been submitted!", "total_queries": len(queries)}
 
 @app.get("/queries")
 async def get_queries():
+   """
+    Retrieves all submitted user queries.
+    Returns:
+        JSONResponse: A list of all submitted queries.
+    """
     return {"submitted_queries": queries}
