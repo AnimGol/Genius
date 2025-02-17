@@ -7,7 +7,6 @@ import pandas as pd
 try: 
     from wordcloud import WordCloud
 except ImportError:
-    import subprocess
     subprocess.check_call(["pip", "install", "wordcloud"])
     from wordcloud import WordCloud
 import matplotlib.pyplot as plt
