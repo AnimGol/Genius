@@ -147,6 +147,7 @@ def perform_text_analysis(id, CLI: bool):
     emotion_frequency =  emotion_frequency (output_path) 
     print (emotion_frequency)
 
+    # This is later used to find the percentage.
     def total_emotion_count (emotion_frequency):
         total = sum (emotion_frequency.values())
         return total
