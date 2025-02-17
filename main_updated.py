@@ -356,6 +356,11 @@ print("Database path:", DB_PATH)
 
 # Initialize the SQLite database
 def initialize_db():
+    """
+    Initializes the SQLite database by creating necessary tables if they don't already exist.
+    Tables include 'books', 'users', and 'uploaded_texts'.
+    Enables foreign key constraints for relational integrity.
+    """
     conn = sqlite3.connect(DB_PATH)   # Connect to the SQLite database file (creates it if it doesn't exist)
     cursor = conn.cursor()            # Create a cursor object to execute SQL commands
 
