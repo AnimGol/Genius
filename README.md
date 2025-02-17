@@ -85,6 +85,4 @@ Group Contribution:
 Mina Golestani: Emotion_analysis, output files, Connecting emotion_analysis and GUI
 Qasim Habib: Main_updated, html files in templates, Connecting emotion_analysis and GUI
 Ali Hajimohammad: Lemmatizing, help page
-لل
-لل
-لل
+
