@@ -79,6 +79,7 @@ def perform_text_analysis(id, CLI: bool):
         content = file.read()
         print ('file is found and read successfully!')
 
+    # make a dictionary from emotion-lexicon with words as keys and emotions as values.
     def emotion_dictionary (file_path):
         emotion_lexicon = {}
         with open(file_path, 'r', encoding='utf-8') as file:
