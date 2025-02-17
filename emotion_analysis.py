@@ -278,13 +278,6 @@ def perform_text_analysis(id, CLI: bool):
 
 
 
-
-
-    # Now trying to save the results and then adding the links to our db:
-    genius1_link = os.path.join(output_dir, f"wordcloud_{id}.png")
-    genius2_link = os.path.join(output_dir, f"wordcloud_nonstop_{id}.png")
-    genius3_link = os.path.join(output_dir, f"barchart{id}.png")
-
     analysis_summary = {
         "text_id": id,
         "word_count": x,
