@@ -263,7 +263,7 @@ def perform_text_analysis(id, CLI: bool):
     print(f"Non-stop word cloud saved to {output_wordcloud_nonstop_path}")
 
 
-
+# Finding the total number of words in the text.
     def sum_counts (full_path ):
         
         with open(full_path, 'r', encoding='utf-8') as file:
