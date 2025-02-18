@@ -163,7 +163,7 @@ def perform_text_analysis(id, CLI: bool):
 
     percentages = add_percentage_to_emotions (emotion_frequency)
 
-
+# This function saves the result as a tsv file containing emotions, counts and percentages
     def save_emotion_results (emotion_frequency, percentages, outputfile):
         with open(outputfile, mode='w', newline='') as file:
             writer = csv.writer(file, delimiter='\t')
