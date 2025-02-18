@@ -208,7 +208,7 @@ def perform_text_analysis(id, CLI: bool):
     plt.savefig(os.path.join(output_dir, f"barchart{id}.png"))
     print ('The barchart is saved.')
 
-
+# creating a dictionary of the most frequent words with their counts as their values
     def words_info (file_path):
         with open(file_path, 'r', encoding='utf-8') as file:
             x = 0
