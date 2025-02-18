@@ -71,6 +71,9 @@ Here are some of the features of this program:
 - The program uses GUI (FastAPI) and contains a user-management system. After a successful login, users can use the program and see the analysis.
 - The program uses the NRC Emotion Lexicon to analyze emotions.
 
+Some of the most important files:
+  emotion_analysis file: read data and perform text and emotion analysis and visualization.
+  main_apdated: put the path of visualizations in database and extract them if user asks, handle GUI, etc.
 
 
 ## Contact Information
@@ -82,7 +85,7 @@ or
 alihmohammad3334@gmail.com
 
 Group Contribution:
-Mina Golestani: Emotion_analysis, output files, Connecting emotion_analysis and GUI
-Qasim Habib: Main_updated, html files in templates, Connecting emotion_analysis and GUI
-Ali Hajimohammad: Lemmatizing, help page
+Mina Golestani: Emotion_analysis, output files, Connecting emotion_analysis and GUI, creating database
+Qasim Habib: Main_updated, html files in templates, Connecting emotion_analysis and GUI, creating database
+Ali Hajimohammad: Lemmatizing, help page, creating database
 
