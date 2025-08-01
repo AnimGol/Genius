@@ -58,7 +58,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # 1) Show a simple form for the user to input the text_id
 @app.get("/analysis-form", response_class=HTMLResponse)
 async def analysis_form(request: Request):
-   """
+    """
     Renders a form for users to input a text ID for emotion analysis.
     Args:
         request (Request): The HTTP request object.
@@ -499,14 +499,8 @@ class User(BaseModel):
 # Login page (GET request)
 @app.get("/login", response_class=HTMLResponse) # "/login" is a path parameter
 async def login_page(request: Request):
-    """
-    Renders the login page for user authentication.
-    Args:
-        request (Request): The HTTP request object.
-    Returns:
-        TemplateResponse: Rendered login.html template.
-    """
-        return templates.TemplateResponse("login.html", {"request": request}) # In curly brackets "request" is the key and request is the value.
+  
+    return templates.TemplateResponse("login.html", {"request": request}) # In curly brackets "request" is the key and request is the value.
 
 
 
@@ -690,13 +684,7 @@ def logout(request: Request, response: Response):
 ####################################
 
 @app.get("/register", response_class=HTMLResponse)
-    """
-    Renders the user registration page.
-    Args:
-        request (Request): The HTTP request object.
-    Returns:
-        TemplateResponse: Rendered register.html template.
-    """
+   
 async def register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
@@ -870,7 +858,7 @@ async def update_book(book_id: str, title: Optional[str] = Form(None), author: O
 # DELETE Methods for deleting users and books
 @app.delete("/users/{user_id}")
 async def delete_user(user_id: int):
-   """
+    """
     Deletes a user from the database.
     Returns:
         JSONResponse: Confirmation message indicating successful deletion.
@@ -1076,9 +1064,6 @@ async def submit_query(query: str = Form(...)):
 
 @app.get("/queries")
 async def get_queries():
-   """
-    Retrieves all submitted user queries.
-    Returns:
-        JSONResponse: A list of all submitted queries.
-    """
     return {"submitted_queries": queries}
+
+
