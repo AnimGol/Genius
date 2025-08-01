@@ -89,3 +89,6 @@ Mina Golestani: Emotion_analysis, output files, Connecting emotion_analysis and 
 Qasim Habib: Main_updated, html files in templates, Connecting emotion_analysis and GUI, creating database
 Ali Hajimohammad: Lemmatizing, help page, creating database
 
+Date:
+February 2025
+
